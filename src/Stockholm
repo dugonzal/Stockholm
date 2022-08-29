@@ -1,4 +1,5 @@
 #! ../venv/bin/python3
+from crypt import crypt
 from distutils import extension
 from importlib.resources import path
 from pkgutil import extend_path
@@ -34,8 +35,7 @@ class stockholm(object):
         self.args = ft_args()
         self.key = self.keygen() # Generate the key
         self.key_save() # Save the key
-        self.crypt = None
-        self.files = [] # List of files to be encrypted and decrypted
+        self.path_files() # Create the directory
 
     def clear(self):
         clear()
@@ -62,14 +62,24 @@ class stockholm(object):
             print("\n ingresa una clave válida!! >= a 16 caracteres: \n")
             self.key_load() # Recursive call to the function esto es recursividad lol xd
         self.key = key
-
-
+        return self.key
 
     def slowprint(self, n):
         for word in n + '\n':
             sys.stdout.write(word)
             sys.stdout.flush()
             time.sleep(0.0033)
+
+    def print_key(self):
+        a = input("Quieres ver la clave ? (s/n): ")
+        if (a == "s" or a == "S"):
+            print("\nLa clave es: " + self.key + "\n")
+        elif (a == "n" or a == "N"):
+            pass
+        else:
+            self.clear()
+            print("\n ingresa una opción válida!! \n")
+            self.print_key()
 
     def key_save(self):
         s = input("\nQuiere guardar la clave en un archivo? (s/n): ")
@@ -91,21 +101,105 @@ class stockholm(object):
             self.key_save() # Recursive call to the function esto es recursividad lol xd
         #time.sleep(0.019) # Wait 0.019 seconds to continue
         #self.clear() # Clear the terminal
+    def ft_extension(self): # funcion para cambiar la extension de los archivos a encriptarq
+        pass
+
     def encrypt_files(self):
-        print("encripando archivos\n")
+        pass
+        if self.args.silent == False :
+            print("\nEncrypting files...\n")
+        print ("\nno se como hacer esto xd lol xdda pero sabre que hacer xd")
 
     def decrypt_files(self):
-        print("\nDecrypting files...")
+        print("\nDecrypting files...\n")
+
+    def path_files(self):
+        self.print_key()
+        if os.path.isdir(os.path.expanduser('~') + "/infection") == True:
+            if self.args.reverse == True:
+              self.decrypt_files()
+            else:
+              self.encrypt_files()
+        else:
+            print('No existe el directorio:', os.path.expanduser("~")+'/infection\n')
+            print('Creamos el directorio\n')
+            os.mkdir(os.path.expanduser("~")+'/infection')
+            print('Directorio creado\n')
+            self.path_files() # Recursive call to the function esto es recursividad lol xd
+
 
 
 ########################################################################################################################
-
-#os.rename('archivo.txt', 'dir') # renombrar archivos
 stockholm = stockholm()
 
-def main():
 
-    stockholm.encrypt_files()
+def main():
+    pass
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
