@@ -1,14 +1,14 @@
-#!/usr/bin/Python3.8
-
+#! ../venv/bin/python3
 from distutils import extension
+from importlib.resources import path
 from pkgutil import extend_path
+import random
+import string
 from banner.banner_ import logo
 from args.args import ft_args
 from clear.clear import clear
-import parser
-import os
-import sys
-import time
+import sys, time, os, getpass, argparse
+from cryptography.fernet import Fernet
 
 
 class stockholm(object):
@@ -33,29 +33,36 @@ class stockholm(object):
         self.slowprint(logo) # Print the banner
         self.args = ft_args()
         self.key = self.keygen() # Generate the key
-        #self.key = None # Key to encrypt and decrypt files (None = not defined) esto es un constructor
+        self.key_save() # Save the key
         self.crypt = None
         self.files = [] # List of files to be encrypted and decrypted
-        # System root is the home directory of the user
-        self.sysRoot = ('~')
 
     def clear(self):
         clear()
 
     def keygen(self):
-        key = input(" La clave debe tener 16 caracteres o más :  ")
-        if len(key) < 16:
-            print("\nKey must be 16 characters or more: \n")
-            self.keygen() # Recursive call to the function esto es recursividad lol xd
-        else:
+        s = input("Quiere generar una clave automaticamente ? (s/n): ")
+        if (s == "s" or s == "S"):
+            key = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(42)) # Generate a random key of 16 characters long
             self.key = key
-            print("\nKey generated successfully \n")
-            #self.clear()
-        SaveKey = open("/mnt/Stockholm.key.txt", "w") # Save the key in a file in the mnt directory of the system
-        SaveKey.write(self.key)
-        SaveKey.close()
-        time.sleep(0.019) # Wait 0.019 seconds to continue
+        elif (s == "n" or s == "N"):
+            key = self.key_load()
+        else:
+            self.clear()
+           # self.slowprint(logo)
+            print("\n ingresa una opción válida!! \n")
+            self.keygen()
         return self.key
+
+    def key_load(self):
+        key = getpass.getpass("\nLa clave debe tener 16 caracteres o más:  ") # Get the key from the user and save it in a variable
+        if len(key) < 16:
+            self.clear()
+            #self.slowprint(logo)
+            print("\n ingresa una clave válida!! >= a 16 caracteres: \n")
+            self.key_load() # Recursive call to the function esto es recursividad lol xd
+        self.key = key
+
 
 
     def slowprint(self, n):
@@ -64,9 +71,41 @@ class stockholm(object):
             sys.stdout.flush()
             time.sleep(0.0033)
 
+    def key_save(self):
+        s = input("\nQuiere guardar la clave en un archivo? (s/n): ")
+        if (s == "s" or s == "S"):
+            f = open(".key.txt", "w")
+            f.write(self.key)
+            f.close()
+            path =  os.path.join(os.path.dirname(__file__), ".key.txt")
+            self.clear()
+           # self.slowprint(logo)
+            self.slowprint("\nla ruta absoluta de la clave es: " + path)
+            self.slowprint("\nKey saved successfully \n")
+        elif (s == "n" or s == "N"):
+            self.slowprint("\nKey not saved \n")
+            time.sleep(0.0021)
+        else:
+            self.clear()
+            print("\n ingresa una opción válida!! \n")
+            self.key_save() # Recursive call to the function esto es recursividad lol xd
+        #time.sleep(0.019) # Wait 0.019 seconds to continue
+        #self.clear() # Clear the terminal
+    def encrypt_files(self):
+        print("encripando archivos\n")
+
+    def decrypt_files(self):
+        print("\nDecrypting files...")
 
 
 ########################################################################################################################
 
 #os.rename('archivo.txt', 'dir') # renombrar archivos
 stockholm = stockholm()
+
+def main():
+
+    stockholm.encrypt_files()
+
+if __name__ == "__main__":
+    main()

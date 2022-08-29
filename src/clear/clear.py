@@ -3,6 +3,6 @@ import sys
 
 def clear():
     if sys.platform == "win32"  or sys.platform == "win64":
-        print('\n' * 100)
+        os.system("cls") # Clear the terminal
     else:
-        os.system('clear')
+        os.system('clear') # Clear the terminal
