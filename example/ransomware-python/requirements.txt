@@ -1,7 +1,0 @@
-os
-time
-socket
-cryptography
-discord_webhook
-colorama
-binascii

@@ -112,26 +112,34 @@ class stockholm(object):
     def decrypt_files(self):
         buffer_size = 256 * 1024
         key = getpass.getpass("Ingresa la clave: ")
-        for path, currentDirectory, files in os.walk(os.path.expanduser("~" + '/infection')): # Loop through the files in the directory
-            try:
+        if self.args.output == False:
+            for path, curerentDirectory, files in os.walk(os.path.expanduser("~" + '/infection')):
+                try:
+                    for file in files:
+                            if file.endswith(".ft"):
+                                pyAesCrypt.decryptFile(os.path.join(path, file), os.path.join(path, file[:-3]), key, buffer_size) # Decrypt the file
+                                os.remove(os.path.join(path, file)) # Delete the original file
+                            else:
+                                print("\nNo se puede desencriptar un archivo no encriptado \n")
+                                exit()
+                    if self.args.silent == False :
+                        for file in files:
+                            print("\nDesencriptando: " + os.path.join(path, file[:-3]), end='\n')
+                except ValueError:
+                    self.clear()
+                    self.slowprint("\nClave incorrecta \n")
+                    self.decrypt_files()
+        else:
+            if  self.args.output == True:
+                path = self.args.output_path
                 for file in files:
-                        if file.endswith(".ft"):
-                            pyAesCrypt.decryptFile(os.path.join(path, file), os.path.join(path, file[:-3]), key, buffer_size) # Decrypt the file
-                            os.remove(os.path.join(path, file)) # Delete the original file
-                        else:
-                            print("\nNo se puede desencriptar un archivo no encriptado \n")
-                            exit()
-            except ValueError:
-                self.clear()
-                self.slowprint("\nClave incorrecta \n")
-                self.decrypt_files()
-        if self.args.silent == False : # hay un problema con el silent xd si no se puede decodificar el archivo sige enseñando el mensaje de desencriptado
-            if any(file.endswith(".ft") for file in files):
-                for file in files:
-                    print("\nDesencriptando: " + os.path.join(path, file[:-3]), end='\n') # Print the name of the decrypted file
-            else:
-                self.slowprint("\nNo se puede desencriptar un archivo que no este encriptado \n")
-                time.sleep(0.0021)
+                    if file.endswith(".ft"):
+                        pyAesCrypt.decryptFile(os.path.join(path, file), os.path.join(path, file[:-3]), key, buffer_size)
+                        os.remove(os.path.join(path, file))
+                        if self.args.silent == False:
+                            print("\nDesencriptando: " + os.path.join(path, file[:-3]), end='\n')
+
+
 
     def path_files(self):
         if os.path.isdir(os.path.expanduser('~') + "/infection") == True:
@@ -184,7 +192,32 @@ if __name__ == "__main__":
 
 
 
+"""
+    def decrypt_files(self):
+        buffer_size = 256 * 1024
+        key = getpass.getpass("Ingresa la clave: ")
 
+        for path, currentDirectory, files in os.walk(os.path.expanduser("~" + '/infection')): # Loop through the files in the directory
+            try:
+                for file in files:
+                        if file.endswith(".ft"):
+                            pyAesCrypt.decryptFile(os.path.join(path, file), os.path.join(path, file[:-3]), key, buffer_size) # Decrypt the file
+                            os.remove(os.path.join(path, file)) # Delete the original file
+                        else:
+                            print("\nNo se puede desencriptar un archivo no encriptado \n")
+                            exit()
+            except ValueError:
+                self.clear()
+                self.slowprint("\nClave incorrecta \n")
+                self.decrypt_files()
+        if self.args.silent == False : # hay un problema con el silent xd si no se puede decodificar el archivo sige enseñando el mensaje de desencriptado
+            if any(file.endswith(".ft") for file in files):
+                for file in files:
+                    print("\nDesencriptando: " + os.path.join(path, file[:-3]), end='\n') # Print the name of the decrypted file
+            else:
+                self.slowprint("\nNo se puede desencriptar un archivo que no este encriptado \n")
+                time.sleep(0.0021)
+"""
 
 
 
